@@ -17,10 +17,11 @@ def get_files_info(working_directory, directory="."):
     try:    
         dir_contents = os.listdir(abs_path)
         contents = "\n".join(list(map(lambda file: f"- {file}: file_size={os.path.getsize(abs_path+os.sep+file)} bytes, is_dir={os.path.isdir(abs_path+os.sep+file)}", dir_contents)))
-        if directory == ".":
-            return f"Results for current directory:\n{contents}"
-        else:
-            return f"Results for '{directory}' directory:\n{contents}"
+        #if directory == ".":
+        #    return f"Results for current directory:\n{contents}"
+        #else:
+        #    return f"Results for '{directory}' directory:\n{contents}"
+        return contents
     except Exception as e:
         return f"Error listing files: {e}"
 
