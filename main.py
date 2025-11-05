@@ -20,13 +20,16 @@ def main():
             model='gemini-2.0-flash-001',
             contents=messages,
         )
+        if len(prompt) > 2:
+            if prompt[2] == "--verbose":
+                print(f"User prompt: {prompt[1]}")
+                print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}\nResponse tokens: {response.usage_metadata.candidates_token_count}")
     else:
         print("Need to provide a prompt")
         sys.exit(1)
 
 
     print(response.text)
-    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}\nResponse tokens: {response.usage_metadata.candidates_token_count}")
 
 
 if __name__ == "__main__":
