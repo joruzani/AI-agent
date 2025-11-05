@@ -2,6 +2,7 @@ import os
 import sys
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 
 def main():
@@ -10,9 +11,14 @@ def main():
     client = genai.Client(api_key=api_key)
 
     prompt = sys.argv
+
     if len(prompt) > 1:
+        messages = [
+            types.Content(role="user", parts=[types.Part(text=prompt[1])]),
+        ]
         response = client.models.generate_content(
-            model='gemini-2.0-flash-001', contents=f"{prompt[1]}"
+            model='gemini-2.0-flash-001',
+            contents=messages,
         )
     else:
         print("Need to provide a prompt")
