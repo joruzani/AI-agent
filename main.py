@@ -3,6 +3,8 @@ import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from config import *
+from functions.get_files_info import schema_get_files_info
 
 
 def main():
@@ -11,14 +13,31 @@ def main():
     client = genai.Client(api_key=api_key)
 
     prompt = sys.argv
+    system_prompt = """
+                    You are a helpful AI coding agent.
+                    
+                    When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
+                    
+                    - List files and directories
+                    
+                    All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
+                    """
+    available_functions = types.Tool(
+    function_declarations=[
+        schema_get_files_info,
+    ]
+)
 
     if len(prompt) > 1:
         messages = [
             types.Content(role="user", parts=[types.Part(text=prompt[1])]),
         ]
         response = client.models.generate_content(
-            model='gemini-2.0-flash-001',
+            model=MODEL_NAME,
             contents=messages,
+            config=types.GenerateContentConfig(
+                tools=[available_functions],
+                system_instruction=system_prompt),
         )
         if len(prompt) > 2:
             if prompt[2] == "--verbose":
@@ -29,7 +48,11 @@ def main():
         sys.exit(1)
 
 
-    print(response.text)
+    if response.function_calls:
+        for fc in response.function_calls:
+           print(f"Calling function: {fc.name}({fc.args})")
+    else:
+        print(response.text)
 
 
 if __name__ == "__main__":

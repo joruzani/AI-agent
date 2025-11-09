@@ -1,1 +1,2 @@
 CHAR_LIMIT = 10000
+MODEL_NAME = "gemini-2.0-flash-001"
