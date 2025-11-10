@@ -1,5 +1,6 @@
 import os
 from config import *
+from google.genai import types
 
 def get_file_content(working_directory, file_path):
     full_path = os.path.join(working_directory, file_path)
@@ -21,3 +22,18 @@ def get_file_content(working_directory, file_path):
             return contents
     except Exception as e:
         return f"Error: reading error {e}"
+
+
+schema_get_files_content = types.FunctionDeclaration(
+    name="get_files_content",
+    description="Gets the contents of the file trunecated to 10k chars",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file path",
+            ),
+        },
+    ),
+)

@@ -1,6 +1,7 @@
 import os
 from config import *
 import subprocess
+from google.genai import types
 
 def run_python_file(working_directory, file_path, args=[]):
     full_path = os.path.join(working_directory, file_path)
@@ -29,4 +30,20 @@ def run_python_file(working_directory, file_path, args=[]):
     except Exception as e:
         return f"Error: running subprocess: {e}"
 
-
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file ",
+    description="Run the provided python script with the provided args as a list",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The path of the python script",
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description="The list of arguments for the script",
+            ),
+        },
+    ),
+)
