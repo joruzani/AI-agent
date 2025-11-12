@@ -24,8 +24,8 @@ def get_file_content(working_directory, file_path):
         return f"Error: reading error {e}"
 
 
-schema_get_files_content = types.FunctionDeclaration(
-    name="get_files_content",
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
     description="Gets the contents of the file trunecated to 10k chars",
     parameters=types.Schema(
         type=types.Type.OBJECT,

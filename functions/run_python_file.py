@@ -31,7 +31,7 @@ def run_python_file(working_directory, file_path, args=[]):
         return f"Error: running subprocess: {e}"
 
 schema_run_python_file = types.FunctionDeclaration(
-    name="run_python_file ",
+    name="run_python_file",
     description="Run the provided python script with the provided args as a list",
     parameters=types.Schema(
         type=types.Type.OBJECT,
@@ -42,8 +42,10 @@ schema_run_python_file = types.FunctionDeclaration(
             ),
             "args": types.Schema(
                 type=types.Type.ARRAY,
+                items=types.Schema(type=types.Type.STRING),
                 description="The list of arguments for the script",
             ),
         },
+        required=["file_path"]
     ),
 )
