@@ -112,33 +112,49 @@ def main():
         messages = [
             types.Content(role="user", parts=[types.Part(text=prompt[1])]),
         ]
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=messages,
-            config=types.GenerateContentConfig(
-                tools=[available_functions], system_instruction=system_prompt
-            ),
-        )
-        if len(prompt) > 2:
-            if prompt[2] == "--verbose":
-                print(f"User prompt: {prompt[1]}")
-                print(
-                    f"Prompt tokens: {response.usage_metadata.prompt_token_count}\nResponse tokens: {response.usage_metadata.candidates_token_count}"
-                )
+        for i in range(0, 21):
+            response = client.models.generate_content(
+                model=MODEL_NAME,
+                contents=messages,
+                config=types.GenerateContentConfig(
+                    tools=[available_functions], system_instruction=system_prompt
+                ),
+            )
+            # if response.text:
+            #     print(response.text)
+            #     break
+            try:
+                for c in response.candidates:
+                    messages.append(c.content)
+            except Exception as e:
+                return f"No candidates found: {e}"
+            if len(prompt) > 2:
+                if prompt[2] == "--verbose":
+                    print(f"User prompt: {prompt[1]}")
+                    print(
+                        f"Prompt tokens: {response.usage_metadata.prompt_token_count}\nResponse tokens: {response.usage_metadata.candidates_token_count}"
+                    )
+            if response.function_calls:
+                for fc in response.function_calls:
+                    print(f"Calling function: {fc.name}({fc.args})")
+                    call_response = call_function(fc, verbose=True)
+                    if not call_response.parts[0].function_response.response:
+                        raise Exception(
+                            "Fatal Exception: All your base are belong to us"
+                        )
+                    else:
+                        print(f"-> {call_response.parts[0].function_response.response}")
+                        messages.append(
+                            types.Content(parts=call_response.parts, role="user")
+                        )
+            if response.text:
+                print(response.text)
+                # break
+            else:
+                print(response.text)
     else:
         print("Need to provide a prompt")
         sys.exit(1)
-
-    if response.function_calls:
-        for fc in response.function_calls:
-            print(f"Calling function: {fc.name}({fc.args})")
-            call_response = call_function(fc, verbose=True)
-            if not call_response.parts[0].function_response.response:
-                raise Exception("Fatal Exception: All your base are belong to us")
-            else:
-                print(f"-> {call_response.parts[0].function_response.response}")
-    else:
-        print(response.text)
 
 
 if __name__ == "__main__":
